@@ -91,13 +91,31 @@ const observer = new IntersectionObserver((entries) => {
     });
 }, observerOptions);
 
-// Observe section-title and about-cards
+// Observe section-title, about-cards, and project-cards
 document.addEventListener('DOMContentLoaded', () => {
-    const sectionTitle = document.querySelector('.section-title');
+    const sectionTitles = document.querySelectorAll('.section-title');
     const aboutCards = document.querySelectorAll('.about-card');
+    const projectCards = document.querySelectorAll('.project-card');
 
-    if (sectionTitle) observer.observe(sectionTitle);
+    sectionTitles.forEach(title => observer.observe(title));
     aboutCards.forEach(card => observer.observe(card));
+    projectCards.forEach(card => observer.observe(card));
+
+    // Add hover effect for project cards on mobile
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    if (isMobile) {
+        projectCards.forEach(card => {
+            card.addEventListener('touchstart', () => {
+                card.style.transform = 'translateY(-5px)';
+            }, { passive: true });
+
+            card.addEventListener('touchend', () => {
+                setTimeout(() => {
+                    card.style.transform = '';
+                }, 200);
+            }, { passive: true });
+        });
+    }
 });
 
 // Timeline animation
@@ -120,7 +138,70 @@ timelineItems.forEach(item => {
     timelineObserver.observe(item);
 });
 
-// Mobile optimization
+// Project filtering functionality
+function setupProjectFilters() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const projectCards = document.querySelectorAll('.project-card');
+
+    filterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Update active button
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            const filterValue = button.getAttribute('data-filter');
+
+            // Filter projects
+            projectCards.forEach(card => {
+                if (filterValue === 'all' || card.getAttribute('data-category') === filterValue) {
+                    card.style.display = 'flex';
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 50);
+                } else {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        card.style.display = 'none';
+                    }, 300);
+                }
+            });
+        });
+    });
+}
+
+// Contact form animation
+function setupContactForm() {
+    const contactForm = document.getElementById('contact-form');
+    if (!contactForm) return;
+
+    contactForm.addEventListener('submit', function(e) {
+        // We don't prevent default because we want the form to submit
+        // This is just for animation
+        const button = this.querySelector('.submit-btn');
+        button.innerHTML = '<span class="btn-text">Sending...</span><span class="btn-icon">✉️</span>';
+
+        // The form will be submitted to FormSubmit.co
+        // No need to handle the submission here
+    });
+
+    // Add focus animations to form fields
+    const formInputs = contactForm.querySelectorAll('input, textarea');
+    formInputs.forEach(input => {
+        input.addEventListener('focus', () => {
+            input.parentElement.classList.add('focused');
+        });
+
+        input.addEventListener('blur', () => {
+            if (!input.value) {
+                input.parentElement.classList.remove('focused');
+            }
+        });
+    });
+}
+
+// Mobile optimization and initialization
 document.addEventListener('DOMContentLoaded', () => {
     const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
@@ -138,4 +219,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }, { passive: true });
         });
     }
+
+    // Observe contact section elements
+    const contactElements = document.querySelectorAll('.contact-form-container, .contact-info, .contact-gif-container');
+    contactElements.forEach(element => observer.observe(element));
+
+    // Initialize project filters and contact form
+    setupProjectFilters();
+    setupContactForm();
 });
