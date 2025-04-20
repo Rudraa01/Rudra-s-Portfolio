@@ -2,7 +2,7 @@
 
 A modern, responsive portfolio website showcasing my skills, projects, and professional experience.
 
-![Portfolio Preview](https://github.com/Rudraa01/Rudra-s-Portfolio/blob/f9cae586b3f7b82a9e0d742710a0c58e65fe54e3/portfoliopic.jpg)
+![Portfolio Preview](portfoliopic.jpg)
 
 ## 🌟 Features
 
