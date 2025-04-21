@@ -171,64 +171,19 @@ function setupProjectFilters() {
     });
 }
 
-// Contact form with Email.js
+// Contact form animation
 function setupContactForm() {
     const contactForm = document.getElementById('contact-form');
-    const formStatus = document.getElementById('form-status');
     if (!contactForm) return;
 
-    contactForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        // Show sending state
+    contactForm.addEventListener('submit', function() {
+        // Show sending state - this is just for visual feedback
         const button = this.querySelector('.submit-btn');
-        const originalButtonHTML = button.innerHTML;
         button.innerHTML = '<span class="btn-text">Sending...</span><span class="btn-icon">✉️</span>';
         button.disabled = true;
 
-        // Clear previous status
-        formStatus.className = 'form-status';
-        formStatus.style.display = 'none';
-        formStatus.textContent = '';
-
-        // Prepare template parameters
-        const templateParams = {
-            user_name: document.getElementById('user_name').value,
-            user_email: document.getElementById('user_email').value,
-            subject: document.getElementById('subject').value,
-            message: document.getElementById('message').value
-        };
-
-        // Send email using Email.js
-        emailjs.send('service_id', 'template_id', templateParams)
-            .then(function(response) {
-                console.log('SUCCESS!', response.status, response.text);
-
-                // Show success message
-                formStatus.textContent = 'Your message has been sent successfully!';
-                formStatus.className = 'form-status success';
-                formStatus.style.display = 'block';
-
-                // Reset form
-                contactForm.reset();
-
-                // Redirect to thanks page after a short delay
-                setTimeout(() => {
-                    window.location.href = 'thanks.html';
-                }, 2000);
-
-            }, function(error) {
-                console.log('FAILED...', error);
-
-                // Show error message
-                formStatus.textContent = 'Oops! Something went wrong. Please try again later.';
-                formStatus.className = 'form-status error';
-                formStatus.style.display = 'block';
-
-                // Reset button
-                button.innerHTML = originalButtonHTML;
-                button.disabled = false;
-            });
+        // The form will be submitted to FormSubmit.co
+        // No need to prevent default or handle the submission here
     });
 
     // Add focus animations to form fields
