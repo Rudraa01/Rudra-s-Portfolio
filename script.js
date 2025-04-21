@@ -171,20 +171,56 @@ function setupProjectFilters() {
     });
 }
 
-// Contact form animation
+// Contact form with EmailJS
 function setupContactForm() {
     const contactForm = document.getElementById('contact-form');
+    const formStatus = document.getElementById('form-status');
     if (!contactForm) return;
 
-    // We won't add a submit event listener that might interfere with the form submission
-    // Instead, just add a click event to the button for visual feedback
-    const submitButton = contactForm.querySelector('.submit-btn');
-    submitButton.addEventListener('click', function() {
-        // Only change the button appearance, but let the form submit normally
-        setTimeout(() => {
-            this.innerHTML = '<span class="btn-text">Sending...</span><span class="btn-icon">✉️</span>';
-            this.disabled = true;
-        }, 10);
+    contactForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Show sending state
+        const button = this.querySelector('.submit-btn');
+        const originalButtonHTML = button.innerHTML;
+        button.innerHTML = '<span class="btn-text">Sending...</span><span class="btn-icon">✉️</span>';
+        button.disabled = true;
+
+        // Clear previous status
+        formStatus.className = 'form-status';
+        formStatus.style.display = 'none';
+        formStatus.textContent = '';
+
+        // Send email using EmailJS
+        emailjs.sendForm('service_portfolio', 'template_portfolio', this)
+            .then(function() {
+                console.log('SUCCESS!');
+
+                // Show success message
+                formStatus.textContent = 'Your message has been sent successfully!';
+                formStatus.className = 'form-status success';
+                formStatus.style.display = 'block';
+
+                // Reset form
+                contactForm.reset();
+
+                // Redirect to thanks page after a short delay
+                setTimeout(() => {
+                    window.location.href = 'thanks.html';
+                }, 2000);
+
+            }, function(error) {
+                console.log('FAILED...', error);
+
+                // Show error message
+                formStatus.textContent = 'Oops! Something went wrong. Please try again later.';
+                formStatus.className = 'form-status error';
+                formStatus.style.display = 'block';
+
+                // Reset button
+                button.innerHTML = originalButtonHTML;
+                button.disabled = false;
+            });
     });
 
     // Add focus animations to form fields
