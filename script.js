@@ -176,14 +176,15 @@ function setupContactForm() {
     const contactForm = document.getElementById('contact-form');
     if (!contactForm) return;
 
-    contactForm.addEventListener('submit', function() {
-        // Show sending state - this is just for visual feedback
-        const button = this.querySelector('.submit-btn');
-        button.innerHTML = '<span class="btn-text">Sending...</span><span class="btn-icon">✉️</span>';
-        button.disabled = true;
-
-        // The form will be submitted to FormSubmit.co
-        // No need to prevent default or handle the submission here
+    // We won't add a submit event listener that might interfere with the form submission
+    // Instead, just add a click event to the button for visual feedback
+    const submitButton = contactForm.querySelector('.submit-btn');
+    submitButton.addEventListener('click', function() {
+        // Only change the button appearance, but let the form submit normally
+        setTimeout(() => {
+            this.innerHTML = '<span class="btn-text">Sending...</span><span class="btn-icon">✉️</span>';
+            this.disabled = true;
+        }, 10);
     });
 
     // Add focus animations to form fields
