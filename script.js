@@ -191,8 +191,21 @@ function setupContactForm() {
         formStatus.style.display = 'none';
         formStatus.textContent = '';
 
-        // Send email using EmailJS
-        emailjs.sendForm('service_portfolio', 'template_portfolio', this)
+        // Get form data
+        const name = document.getElementById('user_name').value;
+        const email = document.getElementById('user_email').value;
+        const subject = document.getElementById('subject').value;
+        const message = document.getElementById('message').value;
+
+        // Use SMTP.js as a fallback if EmailJS fails
+        try {
+            // First try with EmailJS
+            emailjs.send('service_rnc4hzj', 'template_rnc4hzj', {
+                from_name: name,
+                reply_to: email,
+                subject: subject,
+                message: message
+            })
             .then(function() {
                 console.log('SUCCESS!');
 
@@ -210,17 +223,44 @@ function setupContactForm() {
                 }, 2000);
 
             }, function(error) {
-                console.log('FAILED...', error);
+                console.log('EmailJS failed, trying SMTP.js...', error);
 
-                // Show error message
-                formStatus.textContent = 'Oops! Something went wrong. Please try again later.';
-                formStatus.className = 'form-status error';
-                formStatus.style.display = 'block';
+                // Fallback to SMTP.js
+                Email.send({
+                    SecureToken: "8b5f5a78-9d6f-4455-b9c8-2d643143b8fb",
+                    To: 'rudra21172145@gmail.com',
+                    From: "portfolio@contact.com",
+                    Subject: subject + " (from " + name + ")",
+                    Body: "Name: " + name + "<br>Email: " + email + "<br>Message: " + message
+                }).then(function(message) {
+                    console.log("SMTP.js success: " + message);
 
-                // Reset button
-                button.innerHTML = originalButtonHTML;
-                button.disabled = false;
+                    // Show success message
+                    formStatus.textContent = 'Your message has been sent successfully!';
+                    formStatus.className = 'form-status success';
+                    formStatus.style.display = 'block';
+
+                    // Reset form
+                    contactForm.reset();
+
+                    // Redirect to thanks page after a short delay
+                    setTimeout(() => {
+                        window.location.href = 'thanks.html';
+                    }, 2000);
+                });
             });
+        } catch (e) {
+            console.log('Error in email sending:', e);
+
+            // Show error message
+            formStatus.textContent = 'Oops! Something went wrong. Please try again later.';
+            formStatus.className = 'form-status error';
+            formStatus.style.display = 'block';
+
+            // Reset button
+            button.innerHTML = originalButtonHTML;
+            button.disabled = false;
+        }
     });
 
     // Add focus animations to form fields
